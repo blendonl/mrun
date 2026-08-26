@@ -1,0 +1,39 @@
+# Cross-compiles the Windows binary and runs the host-side tests.
+#
+# Both halves run on Linux, which is how mrun is developed: the exe is built
+# with mingw-w64, and the logic with no Windows in it (the fuzzy matcher) is
+# compiled natively and executed. Nothing here needs a Windows runner — what
+# does need one is in MANUAL-TESTS.md, by definition.
+name: build
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install mingw-w64
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-mingw-w64-x86-64
+
+      - name: Host-side unit tests
+        run: make test
+
+      # -Werror here rather than in the Makefile: a warning should fail CI
+      # without making a local build unusable while you are mid-edit.
+      - name: Build (warnings are errors)
+        run: make CFLAGS_EXTRA=-Werror
+
+      - name: Check the release assembles
+        run: make dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mrun-win64
+          path: dist/*.zip

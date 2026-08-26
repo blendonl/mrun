@@ -1,0 +1,32 @@
+# Build objects
+*.o
+*.obj
+*.lto
+
+# Version stamp — makes a VERSION bump invalidate the objects that bake it in
+.version-*
+
+# Build output / release artifacts
+/mrun.exe
+/dist/
+
+# Vendored Lua build artifacts (source is tracked, objects are not)
+/vendor/lua/src/*.o
+/vendor/lua/src/lua
+/vendor/lua/src/luac
+/vendor/lua/src/liblua.a
+
+# Runtime logs
+mrun.log
+
+# Editor / OS cruft
+*~
+*.swp
+.DS_Store
+Thumbs.db
+
+# Host-built test binaries
+/test/test_mrun_score
+
+# Claude Code session state and worktrees — never part of the project.
+.claude/
