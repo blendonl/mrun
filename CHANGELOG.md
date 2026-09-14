@@ -5,18 +5,59 @@ All notable changes to mrun are documented here. This project adheres to
 Sections after 0.1.0 are generated from commit messages; see *Releases* in the
 README.
 
-## Unreleased
+## 0.1.1
 
 ### Changed
 
-- **mrun no longer carries mshell's name.** The log moves from
-  `%LOCALAPPDATA%\mshell\mrun.log` to `%LOCALAPPDATA%\mrun\mrun.log`, and the
-  exe's version resource and manifest identify it as mrun rather than as part
-  of mshell.
-- The shipped `config/mrun.lua` drops its "Reload mshell" entry, which failed on
-  any machine without mshell.
-- mshell no longer looks for `mrun.exe` on its own. Under mshell, bind it with
-  `mshell.exec("mrun.exe")`.
+- Stop carrying mshell's name (a211dfe)
+
+  mrun is a standalone launcher and works with or without mshell.
+
+  - Log to %LOCALAPPDATA%\mrun\mrun.log instead of mshell's directory.
+  - The version resource, manifest identity and usage line name mrun, not mshell.
+  - The shipped config drops its "Reload mshell" entry, which failed anywhere mshell is not installed.
+  - README and MANUAL-TESTS no longer describe mshell's launcher handoff, which mshell has removed; under mshell, mrun is bound with mshell.exec like any other program. The link to mshell stays.
+
+### Other
+
+- **ci:** Publish a release when main carries an untagged version (66c28f8)
+
+  After a green build on main, compare the Makefile's VERSION against the
+  tags on origin. If v$VERSION does not exist yet, tag the commit and publish
+  a GitHub release with the zip the build job just assembled, using that
+  version's CHANGELOG section as the notes. A version with no changelog
+  section fails the job instead of releasing with empty notes.
+
+- **build:** Work out the next version and changelog section from commits (5e754b5)
+
+  `make bump` reads the Conventional Commits since the latest vX.Y.Z tag,
+  picks the next version and writes it to VERSION in the Makefile, with a
+  matching CHANGELOG.md section grouped into Breaking, Added, Fixed, Changed
+  and Other. Commit bodies are kept under each entry; trailers are dropped.
+
+  Before 1.0, feat, fix and breaking changes bump the minor version; after,
+  breaking bumps the major, feat the minor and fix the patch. Anything else
+  bumps the patch.
+
+  Running it again replaces the pending section rather than stacking a new
+  one, and chore(release) commits are left out, so it can run on every push
+  to a branch.
+
+- **ci:** Commit the version bump to pull requests into main (975cafc)
+
+  When a pull request into main is opened or updated, run `make bump` on its
+  branch and push the result as `chore(release): vX.Y.Z`. Merging it then
+  leaves main on an untagged version, which the release job tags and
+  publishes. Nothing is ever committed to main by CI.
+
+  Pull requests from forks are skipped, since the workflow token cannot push
+  to them.
+
+- **docs:** Describe how releases are cut (0e9aee2)
+
+  Point Install at the Releases page, and explain in a new Releases section
+  how the version is chosen, what the bot commit on a pull request is, and
+  how to avoid it with `make bump`.
 
 ## 0.1.0
 
