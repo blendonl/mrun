@@ -1,3 +1,4 @@
+#define COBJMACROS
 #include "mrun.h"
 
 #define APPS_MAX_ENTRIES 4096
@@ -31,6 +32,7 @@ typedef struct {
 
     int       depth;
     bool      show_path;
+    bool      packaged;
 } AppsState;
 
 static AppsState s_apps;
@@ -118,6 +120,72 @@ static void apps_scan_known(REFKNOWNFOLDERID id) {
         apps_scan(path, 0);
         CoTaskMemFree(path);
     }
+}
+
+typedef LONG (WINAPI *ParseAumidFn)(PCWSTR, UINT32 *, PWSTR, UINT32 *, PWSTR);
+
+static bool apps_is_package_app_id(const wchar_t *id) {
+    static ParseAumidFn parse;
+    static bool         probed;
+
+    if (!probed) {
+        probed = true;
+        HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll");
+        if (kernel32)
+            parse = (ParseAumidFn)(void *)
+                        GetProcAddress(kernel32, "ParseApplicationUserModelId");
+    }
+    if (!parse) return false;
+
+    wchar_t family[MAX_PATH];
+    wchar_t app[MAX_PATH];
+    UINT32  family_len = ARRAYSIZE(family);
+    UINT32  app_len    = ARRAYSIZE(app);
+    return parse(id, &family_len, family, &app_len, app) == ERROR_SUCCESS;
+}
+
+static void apps_add_packaged(IShellItem *item) {
+    PWSTR aumid = NULL;
+    PWSTR name  = NULL;
+
+    if (SUCCEEDED(IShellItem_GetDisplayName(item, SIGDN_PARENTRELATIVEPARSING,
+                                            &aumid)) &&
+        apps_is_package_app_id(aumid) &&
+        SUCCEEDED(IShellItem_GetDisplayName(item, SIGDN_NORMALDISPLAY, &name)) &&
+        name[0] && !apps_known_name(name)) {
+        wchar_t exec[MAX_PATH];
+        int n = _snwprintf(exec, MAX_PATH, L"shell:AppsFolder\\%ls", aumid);
+        AppEntry *e = (n > 0 && n < MAX_PATH) ? apps_push() : NULL;
+        if (e) {
+            mrun_copy_w(e->name, MRUN_TITLE_CAP, name);
+            mrun_copy_w(e->exec, MAX_PATH, exec);
+        }
+    }
+
+    CoTaskMemFree(name);
+    CoTaskMemFree(aumid);
+}
+
+static void apps_scan_packaged(void) {
+    IShellItem *folder = NULL;
+    if (FAILED(SHGetKnownFolderItem(&FOLDERID_AppsFolder, KF_FLAG_DEFAULT, NULL,
+                                    &IID_IShellItem, (void **)&folder)))
+        return;
+
+    IEnumShellItems *items = NULL;
+    if (SUCCEEDED(IShellItem_BindToHandler(folder, NULL, &BHID_EnumItems,
+                                           &IID_IEnumShellItems,
+                                           (void **)&items))) {
+        IShellItem *item = NULL;
+        while (s_apps.count < APPS_MAX_ENTRIES &&
+               IEnumShellItems_Next(items, 1, &item, NULL) == S_OK) {
+            apps_add_packaged(item);
+            IShellItem_Release(item);
+        }
+        IEnumShellItems_Release(items);
+    }
+
+    IShellItem_Release(folder);
 }
 
 static void apps_add_root(AppsState *st, const wchar_t *raw) {
@@ -228,6 +296,10 @@ static void apps_configure(MrunModule *m, lua_State *L, int tbl) {
     if (lua_isboolean(L, -1)) st->show_path = lua_toboolean(L, -1);
     lua_pop(L, 1);
 
+    lua_getfield(L, tbl, "packaged");
+    if (lua_isboolean(L, -1)) st->packaged = lua_toboolean(L, -1);
+    lua_pop(L, 1);
+
     apps_read_extra(st, L, tbl);
 }
 
@@ -247,6 +319,8 @@ static bool apps_init(MrunModule *m) {
         apps_scan_known(&FOLDERID_CommonPrograms);
         apps_scan_known(&FOLDERID_Programs);
     }
+
+    if (st->packaged) apps_scan_packaged();
 
     log_msg(LOG_INFO, L"mrun/apps: indexed %d entries", st->count);
     return true;
@@ -291,6 +365,7 @@ void mod_apps_register(void) {
     apps_free_all(&s_apps);
     s_apps.depth     = APPS_DEPTH;
     s_apps.show_path = false;
+    s_apps.packaged  = true;
     s_apps.ext_count = 0;
     mrun_copy_w(s_apps.exts[s_apps.ext_count++], 16, L".lnk");
     mrun_copy_w(s_apps.exts[s_apps.ext_count++], 16, L".url");

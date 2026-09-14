@@ -48,6 +48,9 @@ to look.
   the selection.
 - Click another window while it is open → it hides (`hide_on_blur`).
 - Install a program, press `Ctrl+R`, and it is findable without restarting mrun.
+- Packaged apps with no Start menu shortcut are found and launch: `settings` →
+  **Settings**, `calc` → **Calculator**, and any Store/MSIX app such as
+  **Claude**. With `packaged = false` and `--reload`, they are gone.
 - Type fast (hold a key on autorepeat) with several hundred results matching:
   no visible lag, no flicker.
 - Leave it open for a few minutes typing and deleting: memory in Task Manager

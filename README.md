@@ -129,8 +129,10 @@ path and a URL all work, because they are handed to `ShellExecuteW`.
 ## Modules
 
 Every result comes from a module. `apps` is the only built-in one today — it
-indexes both Start menus. Clipboard history and emoji are the obvious next ones
-and will register under their own names.
+indexes both Start menus, plus the packaged (Microsoft Store / MSIX) apps that
+have no shortcut file there, such as Settings, Calculator or Claude; set
+`packaged = false` to leave those out. Clipboard history and emoji are the
+obvious next ones and will register under their own names.
 
 `set_modules` lists the enabled ones and the order they are searched in. Order
 of declaration in the file does not matter; names are resolved after the whole
@@ -143,6 +145,7 @@ mrun.configure("apps", {
     extensions  = { ".lnk", ".url" },   -- add ".exe" to index raw binaries
     depth       = 4,
     show_path   = false,
+    packaged    = true,
     max_results = 50,
     extra = {
         { name = "Terminal", exec = "cmd.exe" },
