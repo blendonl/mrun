@@ -5,6 +5,22 @@ All notable changes to mrun are documented here. This project adheres to
 Sections after 0.1.0 are generated from commit messages; see *Releases* in the
 README.
 
+## 0.6.0
+
+### Fixed
+
+- **apps:** Launch packaged desktop apps without Explorer (1dc2f3a)
+
+  ShellExecute on shell:AppsFolder\<AUMID> fails for every packaged app
+  when Explorer is not the shell, so Claude, Notepad, Terminal and the
+  other MSIX apps the apps module lists could not be opened under mshell.
+
+  Activate packaged apps whose host environment is the desktop through
+  IApplicationActivationManager, which works with or without Explorer,
+  and fall back to ShellExecute if activation fails. UWP apps stay on
+  ShellExecute: activating them without Explorer blocks the launcher for
+  about 46 seconds and still fails.
+
 ## 0.5.1
 
 ### Other
