@@ -5,6 +5,17 @@ All notable changes to mrun are documented here. This project adheres to
 Sections after 0.1.0 are generated from commit messages; see *Releases* in the
 README.
 
+## 0.5.1
+
+### Other
+
+- **docs:** Stop suggesting mrun share a folder with mshell (c2c3288)
+
+  The Updating section and a manual test described leaving generic files alone
+  as protecting a folder mrun shares with mshell.exe. mrun belongs in a folder of
+  its own, such as the install script's, so the docs now say that instead, and
+  the manual test no longer names mshell.
+
 ## 0.5.0
 
 ### Added
