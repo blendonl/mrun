@@ -54,6 +54,17 @@ static void draw_text(HDC dc, RECT rc, const wchar_t *text, COLORREF color,
               DT_END_ELLIPSIS);
 }
 
+static void draw_icon(HDC dc, HBITMAP icon, int x, int y, int size) {
+    HDC src = CreateCompatibleDC(dc);
+    if (!src) return;
+
+    HGDIOBJ       old   = SelectObject(src, icon);
+    BLENDFUNCTION blend = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
+    GdiAlphaBlend(dc, x, y, size, size, src, 0, 0, size, size, blend);
+    SelectObject(src, old);
+    DeleteDC(src);
+}
+
 static int visible_rows(void) {
     int rows = mr.look.rows;
     if (mr.results.count < rows) rows = mr.results.count;
@@ -148,6 +159,17 @@ static void paint_row(HDC dc, const MrunItem *item, RECT row, bool selected,
 
     int pad  = mrun_scale(a->padding, dpi);
     RECT text = { row.left + pad, row.top, row.right - pad, row.bottom };
+
+    if (a->show_icons) {
+        int room = row.bottom - row.top;
+        int size = mrun_scale(a->icon_size, dpi);
+        if (size > room) size = room;
+
+        HBITMAP icon = mrun_icons_get(item->icon, size);
+        if (icon)
+            draw_icon(dc, icon, text.left, row.top + (room - size) / 2, size);
+        text.left += size + pad;
+    }
 
     if (a->show_module && item->owner && !mr.routed) {
         SelectObject(dc, font_get(&s_sub, dpi,
@@ -429,6 +451,7 @@ static bool handle_key(WPARAM vk) {
             return true;
         case 'R':
             mrun_modules_reload_data();
+            mrun_icons_flush();
             mrun_ui_refresh();
             return true;
         }
@@ -498,6 +521,11 @@ static LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     case WM_MRUN_QUIT:
         mr.quitting = true;
         DestroyWindow(hwnd);
+        return 0;
+
+    case WM_MRUN_ICON:
+        if (mrun_icons_deliver(wp, lp) && mr.visible)
+            InvalidateRect(hwnd, NULL, FALSE);
         return 0;
 
     case WM_COPYDATA: {
@@ -585,6 +613,8 @@ bool mrun_ui_init(void) {
 }
 
 void mrun_ui_shutdown(void) {
+    mrun_icons_shutdown();
+
     if (mr.window) {
         DestroyWindow(mr.window);
         mr.window = NULL;

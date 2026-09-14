@@ -7,7 +7,7 @@ CC       = x86_64-w64-mingw32-gcc
 WINDRES  = x86_64-w64-mingw32-windres
 
 # --- Version (single source of truth; baked into the binary and the zip) ---
-VERSION  = 0.4.0
+VERSION  = 0.5.0
 
 # VERSIONINFO needs the parts as separate numbers, so split them out here
 # rather than making anyone maintain the version in two shapes.
@@ -56,6 +56,7 @@ MRUN_SRCS = $(SRC_DIR)/mrun.c        \
             $(SRC_DIR)/mrun_lua.c    \
             $(SRC_DIR)/mrun_module.c \
             $(SRC_DIR)/mrun_score.c  \
+            $(SRC_DIR)/mrun_icon.c   \
             $(SRC_DIR)/mrun_update.c \
             $(SRC_DIR)/mod_apps.c    \
             $(SRC_DIR)/mod_settings.c \
