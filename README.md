@@ -42,14 +42,50 @@ make test       # host-side unit tests (the fuzzy matcher)
 make dist       # -> dist/mrun-<version>-win64.zip
 ```
 
+## Releases
+
+Every pull request merged into `main` is a release. While the PR is open, CI
+works out the next version from its
+[Conventional Commits](https://www.conventionalcommits.org/) and pushes a
+`chore(release): vX.Y.Z` commit to the branch that sets `VERSION` in the
+Makefile and writes the matching section of `CHANGELOG.md`. When the PR merges,
+CI tags that version and publishes the zip with that section as its notes.
+
+Before 1.0, `feat`, `fix` and breaking changes (`feat!:`, or a
+`BREAKING CHANGE:` footer) bump the minor version. From 1.0, breaking changes
+bump the major, `feat` the minor and `fix` the patch. Anything else bumps the
+patch.
+
+Pull after the bot commits before pushing to the branch again, or run
+`make bump` and commit the result yourself so there is nothing for it to add.
+Commits pushed straight to `main` are not released on their own; they go out
+with the next merged PR.
+
 ## Install
 
-There is no installer, because there is nothing to install: `mrun.exe` is a
-single self-contained binary. Put it anywhere on your `PATH` (or anywhere at
-all) and run it.
+In PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/blendonl/mrun/main/install.ps1 | iex
+```
+
+That downloads the latest release into `%LOCALAPPDATA%\Programs\mrun` and adds
+the folder to your user `PATH`. Run it again to upgrade; a copy running from
+that folder is stopped for the upgrade and started again. To pin a version, or
+install somewhere else:
+
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/blendonl/mrun/main/install.ps1))) -Version 0.1.0 -InstallDir C:\Tools\mrun
+```
+
+Nothing about it needs the script, though: `mrun.exe` is a single
+self-contained binary. Download `mrun-<version>-win64.zip` from
+[Releases](https://github.com/blendonl/mrun/releases), or build it, and put it
+anywhere on your `PATH` (or anywhere at all).
 
 Copy `config/mrun.lua` to `%APPDATA%\mrun\init.lua` when you want to configure
-it. Until then it runs on built-in defaults.
+it. Until then it runs on built-in defaults. Keep your changes there rather than
+in the copy beside the exe, which an upgrade overwrites.
 
 ## Using it
 
