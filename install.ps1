@@ -1,6 +1,7 @@
 param(
     [string]$Version,
-    [string]$InstallDir = (Join-Path $env:LOCALAPPDATA 'Programs\mrun')
+    [string]$InstallDir = (Join-Path $env:LOCALAPPDATA 'Programs\mrun'),
+    [switch]$SkipPath
 )
 
 function Get-MrunRelease {
@@ -17,6 +18,13 @@ function Get-MrunRelease {
         throw "Release $($found.tag_name) has no mrun-*-win64.zip to install."
     }
     [pscustomobject]@{ Tag = $found.tag_name; Name = $asset.name; Url = $asset.browser_download_url }
+}
+
+function Get-InstalledVersion {
+    param([string]$Exe)
+    if (Test-Path -LiteralPath $Exe -PathType Leaf) {
+        (Get-Item -LiteralPath $Exe).VersionInfo.ProductVersion
+    }
 }
 
 function Stop-InstalledMrun {
@@ -59,7 +67,7 @@ function Add-UserPath {
 }
 
 function Install-Mrun {
-    param([string]$Version, [string]$InstallDir)
+    param([string]$Version, [string]$InstallDir, [switch]$SkipPath)
     $ErrorActionPreference = 'Stop'
     $ProgressPreference = 'SilentlyContinue'
     [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
@@ -70,6 +78,11 @@ function Install-Mrun {
 
     $release = Get-MrunRelease $Version
     $exe = Join-Path $InstallDir 'mrun.exe'
+    if ((Get-InstalledVersion $exe) -eq $release.Tag.TrimStart('v')) {
+        Write-Host "mrun $($release.Tag) is already installed in $InstallDir"
+        return
+    }
+
     $staging = Join-Path ([IO.Path]::GetTempPath()) "mrun-install-$([guid]::NewGuid())"
     New-Item -ItemType Directory $staging | Out-Null
     try {
@@ -86,7 +99,7 @@ function Install-Mrun {
         Remove-Item $staging -Recurse -Force -ErrorAction SilentlyContinue
     }
 
-    $addedToPath = Add-UserPath $InstallDir
+    $addedToPath = if ($SkipPath) { $false } else { Add-UserPath $InstallDir }
     if ($wasRunning) {
         Start-Process $exe '--daemon'
     }
@@ -98,4 +111,4 @@ function Install-Mrun {
     Write-Host "Run 'mrun' to open it."
 }
 
-Install-Mrun -Version $Version -InstallDir $InstallDir
+Install-Mrun -Version $Version -InstallDir $InstallDir -SkipPath:$SkipPath
