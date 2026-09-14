@@ -3,6 +3,19 @@
 All notable changes to mrun are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/) (pre-1.0: minor = features + fixes).
 
+## Unreleased
+
+### Changed
+
+- **mrun no longer carries mshell's name.** The log moves from
+  `%LOCALAPPDATA%\mshell\mrun.log` to `%LOCALAPPDATA%\mrun\mrun.log`, and the
+  exe's version resource and manifest identify it as mrun rather than as part
+  of mshell.
+- The shipped `config/mrun.lua` drops its "Reload mshell" entry, which failed on
+  any machine without mshell.
+- mshell no longer looks for `mrun.exe` on its own. Under mshell, bind it with
+  `mshell.exec("mrun.exe")`.
+
 ## 0.1.0
 
 First release. Extracted from [mshell](https://github.com/blendonl/mshell), whose

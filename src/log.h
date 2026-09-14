@@ -36,7 +36,7 @@ typedef enum {
     LOG_TRACE = 4,
 } LogLevel;
 
-/* Open %LOCALAPPDATA%\mshell\<basename>.log for append, rotating it first if
+/* Open %LOCALAPPDATA%\mrun\<basename>.log for append, rotating it first if
  * it has grown past the size cap. Falls back to %TEMP% when LOCALAPPDATA is
  * unset (a service account, say). Safe to call once; later calls are ignored.
  *

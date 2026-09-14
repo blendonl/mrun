@@ -1,25 +1,14 @@
 --[[
     mrun — the launcher's configuration.
 
-    mrun is a SEPARATE program from mshell. It has its own binary (mrun.exe),
-    its own Lua state and this, its own config file. Nothing here affects
-    init.lua and nothing in init.lua affects this.
-
     Location:  %APPDATA%\mrun\init.lua
                ...or config\mrun.lua beside mrun.exe (portable installs)
     Check it:  mrun.exe --check
     Reload:    mrun.exe --reload
-    Log:       %LOCALAPPDATA%\mshell\mrun.log
+    Log:       %LOCALAPPDATA%\mrun\mrun.log
 
     A config error is atomic: the whole file is rejected and mrun runs with
     built-in defaults rather than half of what you wrote.
-
-    Bind it from init.lua, e.g.
-
-        mshell.bind("LWin+Space", "spawn", "mrun.exe")
-
-    (mshell's own `launcher` action already prefers mrun.exe when it is
-    installed beside mshell.exe, so an existing binding keeps working.)
 --]]
 
 ----------------------------------------------------------------------
@@ -96,8 +85,6 @@ mrun.configure("apps", {
     extra = {
         { name = "Terminal",       exec = "cmd.exe" },
         { name = "Registry Editor", exec = "regedit.exe" },
-        { name = "Reload mshell",  exec = "mshell.exe", args = "--msg reload",
-          subtitle = "re-read init.lua" },
     },
 })
 

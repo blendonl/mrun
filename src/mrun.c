@@ -202,7 +202,7 @@ static void parse_args(Options *opt) {
 }
 
 static const char *USAGE =
-    "mrun " MRUN_VERSION " - a modular launcher for mshell\n"
+    "mrun " MRUN_VERSION " - a modular keyboard launcher for Windows\n"
     "\n"
     "  mrun                     toggle the launcher (starts it if needed)\n"
     "  mrun --show|--hide       show or hide it\n"
