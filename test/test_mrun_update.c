@@ -27,8 +27,10 @@ int main(void) {
           "-Command must stay one argument: %ls", out);
     CHECK(wcsstr(out, L"Invoke-RestMethod '" URL L"'") != NULL,
           "fetches the script it was given: %ls", out);
-    CHECK(wcsstr(out, L"-InstallDir 'C:\\Tools\\mrun\\' -SkipPath") != NULL,
-          "installs over the folder it was given: %ls", out);
+    CHECK(wcsstr(out, L"-InstallDir 'C:\\Tools\\mrun\\' -SkipPath -SkipDocs;")
+              != NULL,
+          "installs over the folder it was given, leaving PATH and any "
+          "README or LICENSE there alone: %ls", out);
 
     CHECK(mrun_update_params(URL, L"C:\\Users\\O'Brien\\mrun\\", out, CAP),
           "an apostrophe must build");

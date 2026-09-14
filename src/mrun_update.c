@@ -44,7 +44,7 @@ bool mrun_update_params(const wchar_t *script_url, const wchar_t *install_dir,
     put_single_quoted(&b, script_url);
     put_text(&b, L"))) -InstallDir ");
     put_single_quoted(&b, install_dir);
-    put_text(&b, L" -SkipPath; Start-Sleep -Seconds 3 } "
+    put_text(&b, L" -SkipPath -SkipDocs; Start-Sleep -Seconds 3 } "
                  L"catch { Write-Host $_ -ForegroundColor Red; "
                  L"Read-Host 'Press Enter to close' }\"");
 

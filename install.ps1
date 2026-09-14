@@ -1,7 +1,8 @@
 param(
     [string]$Version,
     [string]$InstallDir = (Join-Path $env:LOCALAPPDATA 'Programs\mrun'),
-    [switch]$SkipPath
+    [switch]$SkipPath,
+    [switch]$SkipDocs
 )
 
 function Get-MrunRelease {
@@ -66,8 +67,19 @@ function Add-UserPath {
     return $true
 }
 
+function Copy-MrunPayload {
+    param([string]$From, [string]$To, [switch]$SkipDocs)
+    if (-not $SkipDocs) {
+        Copy-Item (Join-Path $From '*') $To -Recurse -Force
+        return
+    }
+    Get-ChildItem -LiteralPath $From |
+        Where-Object Name -notin 'README.md', 'CHANGELOG.md', 'MANUAL-TESTS.md', 'LICENSE' |
+        Copy-Item -Destination $To -Recurse -Force
+}
+
 function Install-Mrun {
-    param([string]$Version, [string]$InstallDir, [switch]$SkipPath)
+    param([string]$Version, [string]$InstallDir, [switch]$SkipPath, [switch]$SkipDocs)
     $ErrorActionPreference = 'Stop'
     $ProgressPreference = 'SilentlyContinue'
     [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
@@ -94,7 +106,7 @@ function Install-Mrun {
 
         $wasRunning = Stop-InstalledMrun $exe
         New-Item -ItemType Directory -Force $InstallDir | Out-Null
-        Copy-Item (Join-Path $payload.FullName '*') $InstallDir -Recurse -Force
+        Copy-MrunPayload $payload.FullName $InstallDir -SkipDocs:$SkipDocs
     } finally {
         Remove-Item $staging -Recurse -Force -ErrorAction SilentlyContinue
     }
@@ -111,4 +123,4 @@ function Install-Mrun {
     Write-Host "Run 'mrun' to open it."
 }
 
-Install-Mrun -Version $Version -InstallDir $InstallDir -SkipPath:$SkipPath
+Install-Mrun -Version $Version -InstallDir $InstallDir -SkipPath:$SkipPath -SkipDocs:$SkipDocs
