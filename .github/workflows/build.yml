@@ -38,6 +38,34 @@ jobs:
           name: mrun-win64
           path: dist/*.zip
 
+  bump:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.base_ref == 'main' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: bump-${{ github.head_ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Work out the version and changelog
+        run: python3 tools/bump.py
+
+      - name: Commit them to the branch
+        run: |
+          git diff --quiet && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "chore(release): v$(make -s print-version)"
+          git push origin "HEAD:$GITHUB_HEAD_REF"
+
   release:
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
