@@ -5,6 +5,29 @@ All notable changes to mrun are documented here. This project adheres to
 Sections after 0.1.0 are generated from commit messages; see *Releases* in the
 README.
 
+## 0.4.0
+
+### Added
+
+- **ui:** Show each result's icon (3945b3d)
+
+  Rows were text only, so entries with similar names could only be told
+  apart by reading them.
+
+  - Each row draws the shell's icon for what it launches: Start menu
+    shortcuts, packaged apps, folders, URLs, and bare names found on PATH
+    or under App Paths. An image file is drawn as itself.
+  - Icons are loaded on a background thread and cached per path, so
+    opening the launcher and typing never wait on the shell; an icon
+    appears as soon as it is ready.
+  - Icons are extracted at the row's real pixel size, so they stay sharp
+    at any scaling, and are loaded again when the DPI or icon_size
+    changes. Ctrl+R reloads them along with the index.
+  - Lua rows and the apps module's extra entries take an optional `icon`
+    path, defaulting to `exec`; `""` draws none.
+  - New appearance options `show_icons` (on by default) and `icon_size`
+    (24).
+
 ## 0.3.0
 
 ### Fixed
