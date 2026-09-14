@@ -5,7 +5,24 @@ All notable changes to mrun are documented here. This project adheres to
 Sections after 0.1.0 are generated from commit messages; see *Releases* in the
 README.
 
-## 0.1.1
+## 0.2.0
+
+### Added
+
+- Install and upgrade with one line of PowerShell (9c968fa)
+
+  `irm https://raw.githubusercontent.com/blendonl/mrun/main/install.ps1 | iex`
+  downloads the latest release into %LOCALAPPDATA%\Programs\mrun and adds
+  that folder to the user PATH, so `mrun` works in any new terminal with no
+  manual steps.
+
+  - Running it again upgrades in place. A copy running from the install
+    folder is quit first, so its exe is not locked, and started again with
+    --daemon afterwards. Copies running from anywhere else are left alone.
+  - The PATH entry is only added once. The value stays REG_EXPAND_SZ with its
+    %VARIABLE% entries unexpanded, and the change is broadcast so Explorer
+    and newly opened terminals see it.
+  - -Version pins a release and -InstallDir picks another folder.
 
 ### Changed
 
