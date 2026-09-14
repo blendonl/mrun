@@ -5,6 +5,47 @@ All notable changes to mrun are documented here. This project adheres to
 Sections after 0.1.0 are generated from commit messages; see *Releases* in the
 README.
 
+## 0.4.0
+
+### Added
+
+- **install:** Leave an install that is already up to date alone (ebd5cd3)
+
+  Running install.ps1 against a folder whose mrun.exe already is the release
+  being installed now says so and stops: nothing is downloaded, and a copy
+  running from that folder is not restarted.
+
+  - -SkipPath installs or upgrades without adding the folder to the user PATH.
+
+- Update mrun from the launcher (25cc84f)
+
+  Type "update mrun" and press Enter. After a Yes/No box naming the installed
+  version and the folder, mrun runs install.ps1 over the folder it is running
+  from: the latest release is downloaded, mrun is stopped while its files are
+  replaced and started again, and PATH is left alone. `mrun --update` does the
+  same without asking.
+
+  - The row comes from a new built-in module, `settings`, the home for mrun's
+    own actions. It stays enabled when `set_modules` leaves it out, so a config
+    written before it existed can still update mrun, and
+    `mrun.configure("settings", { enabled = false })` turns it off. With a
+    prefix configured, typing the prefix alone lists every action in it.
+  - Progress shows in a PowerShell window that closes by itself on success and
+    stays open with the error on failure.
+  - The PowerShell command is built by mrun_update.c, which has no Windows in
+    it and is unit-tested, down to how apostrophes in a folder name are quoted.
+
+- **install:** Leave a shared folder's own files alone when updating (2f3ac1a)
+
+  mrun.exe is often dropped beside mshell.exe, and Update mrun installs over
+  whatever folder the running copy is in. It now replaces mrun.exe and
+  config\mrun.lua there without copying in README.md, CHANGELOG.md,
+  MANUAL-TESTS.md or LICENSE, so another program's files of the same name are
+  not overwritten and the folder is not filled with mrun's documents.
+
+  - -SkipDocs gives install.ps1 the same behaviour. Without it, the one-line
+    installer still copies the whole release, as before.
+
 ## 0.3.0
 
 ### Fixed

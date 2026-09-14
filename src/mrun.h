@@ -16,6 +16,7 @@
 
 #include "log.h"
 #include "mrun_score.h"
+#include "mrun_update.h"
 
 #ifndef MRUN_VERSION
 #define MRUN_VERSION "0.0.0"
@@ -64,6 +65,7 @@ struct MrunModule {
     wchar_t prefix[MRUN_PREFIX_CAP];
     wchar_t description[MRUN_DESC_CAP];
     bool    enabled;
+    bool    enabled_when_unlisted;
     bool    is_lua;
     int     max_results;
 
@@ -171,6 +173,8 @@ void        mrun_results_reset(void);
 bool        mrun_activate(int index);
 
 void mod_apps_register(void);
+void mod_settings_register(void);
+bool mrun_update_start(void);
 
 void mrun_appearance_defaults(MrunAppearance *look);
 bool mrun_config_load(void);

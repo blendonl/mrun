@@ -62,9 +62,9 @@ mrun.set_behaviour({
 -- enabled and the order they are searched in; leave it out and every
 -- registered module is enabled.
 --
--- "apps" is the only built-in module today. Clipboard history and emoji are
--- the obvious next ones, and they will register under their own names — at
--- which point they go in this list too.
+-- "apps" and "settings" are built in. "settings" (Update mrun) stays on even
+-- when it is left out of this list. Clipboard history and emoji are the
+-- obvious next ones, and they will register under their own names.
 ----------------------------------------------------------------------
 mrun.set_modules({ "apps", "calc" })
 

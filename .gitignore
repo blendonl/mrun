@@ -27,6 +27,7 @@ Thumbs.db
 
 # Host-built test binaries
 /test/test_mrun_score
+/test/test_mrun_update
 
 # Claude Code session state and worktrees — never part of the project.
 .claude/
