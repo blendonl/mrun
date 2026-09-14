@@ -13,7 +13,7 @@ a module is thirty lines of Lua if you want it to be.
 └──────────────────────────────────────────────────────────┘
 ```
 
-Built for [mshell](https://github.com/notpc/mshell) — a tiling WM that replaces
+Built for [mshell](https://github.com/blendonl/mshell) — a tiling WM that replaces
 `explorer.exe`, where there is no Start menu and no Run box — but it depends on
 nothing from it and works fine under plain Explorer.
 

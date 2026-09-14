@@ -5,7 +5,7 @@ All notable changes to mrun are documented here. This project adheres to
 
 ## 0.1.0
 
-First release. Extracted from [mshell](https://github.com/notpc/mshell), whose
+First release. Extracted from [mshell](https://github.com/blendonl/mshell), whose
 built-in launcher this replaces.
 
 ### Added
