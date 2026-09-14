@@ -168,3 +168,8 @@ make clean && make VERSION=0.0.1 \
   (it is a tool window). It floats over the tiles.
 - Open mrun, then quit mshell from another machine/Task Manager: mrun is
   unaffected — it is a separate process and owns its own keyboard input.
+- With mshell as the shell (no Explorer), `claude` → **Claude** and `notepad`
+  → **Notepad** launch. With `--log-level debug` the log says `activated`.
+- In the same session, `calc` → **Calculator** does not launch, since Windows
+  cannot host UWP apps without Explorer, but the launcher stays open straight
+  away rather than freezing for most of a minute.
