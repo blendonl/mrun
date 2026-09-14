@@ -5,6 +5,23 @@ All notable changes to mrun are documented here. This project adheres to
 Sections after 0.1.0 are generated from commit messages; see *Releases* in the
 README.
 
+## 0.3.0
+
+### Fixed
+
+- **apps:** Find packaged apps that have no Start menu shortcut (d7a6288)
+
+  The apps module only indexed .lnk and .url files under the two Start menus.
+  Microsoft Store and MSIX apps such as Claude, Settings and Calculator have no
+  file there, so they were never found.
+
+  - Enumerate the Apps folder and add every entry whose ID parses as a package
+    application ID, launched through shell:AppsFolder\<AUMID>. Start menu
+    shortcuts and extra entries still win on a name clash.
+  - New `packaged` option on the apps module, on by default, to leave them out.
+  - COM is initialized once on the main thread, which the Apps folder and the
+    shell:AppsFolder launch both need.
+
 ## 0.2.0
 
 ### Added

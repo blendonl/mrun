@@ -79,6 +79,7 @@ mrun.configure("apps", {
     extensions  = { ".lnk", ".url" },   -- add ".exe" to index raw binaries
     depth       = 4,                    -- how deep to recurse
     show_path   = false,                -- put the containing folder in the subtitle
+    packaged    = true,
     max_results = 50,
 
     -- Anything the Start menu does not have a shortcut for.
