@@ -114,9 +114,13 @@ HOST_CC   = cc
 TEST_DIR  = test
 TEST_BINS = $(TEST_DIR)/test_mrun_score
 
-.PHONY: all clean check-lua dist test print-version
+.PHONY: all bump clean check-lua dist test print-version
 
 all: check-lua $(TARGET)
+
+bump:
+	-git fetch --tags --quiet
+	python3 tools/bump.py
 
 # Something outside the Makefile has to be able to learn the version (a release
 # workflow comparing it against the tags already pushed). It asks here rather
