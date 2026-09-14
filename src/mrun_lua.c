@@ -49,6 +49,7 @@ static int l_set_appearance(lua_State *L) {
     field_int(L, 1, "padding",       &a->padding);
     field_int(L, 1, "font_size",     &a->font_size);
     field_int(L, 1, "sub_font_size", &a->sub_font_size);
+    field_int(L, 1, "icon_size",     &a->icon_size);
     field_int(L, 1, "border_width",  &a->border_width);
     field_int(L, 1, "opacity",       &a->opacity);
     field_int(L, 1, "corner_radius", &a->corner_radius);
@@ -65,6 +66,7 @@ static int l_set_appearance(lua_State *L) {
 
     field_bool(L, 1, "rounded",        &a->rounded);
     field_bool(L, 1, "show_subtitles", &a->show_subtitles);
+    field_bool(L, 1, "show_icons",     &a->show_icons);
     field_bool(L, 1, "show_module",    &a->show_module);
     field_bool(L, 1, "show_scrollbar", &a->show_scrollbar);
 
@@ -82,6 +84,7 @@ static int l_set_appearance(lua_State *L) {
     if (a->opacity > 255) a->opacity = 255;
     if (a->rows < 1)      a->rows    = 1;
     if (a->width < 160)   a->width   = 160;
+    if (a->icon_size < 8) a->icon_size = 8;
 
     return 0;
 }
@@ -285,6 +288,8 @@ static void read_lua_item(lua_State *L, int idx, MrunItem *item) {
     field_wstr(L, idx, "exec",     item->exec,     MAX_PATH);
     field_wstr(L, idx, "args",     item->args,     MRUN_ARGS_CAP);
     field_wstr(L, idx, "cwd",      item->cwd,      MAX_PATH);
+    if (!field_wstr(L, idx, "icon", item->icon, MAX_PATH))
+        mrun_copy_w(item->icon, MAX_PATH, item->exec);
 }
 
 void mrun_lua_module_search(MrunModule *m, const wchar_t *query,

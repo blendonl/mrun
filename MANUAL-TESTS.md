@@ -94,6 +94,27 @@ to look.
 - Set `show_subtitles = false`, `show_module = false`, `show_scrollbar = false`
   in turn: each disappears and the layout stays sane.
 
+## Icons
+
+- Every app row has its icon: Start menu shortcuts (no shortcut arrow),
+  packaged apps such as **Settings** and **Calculator**, and `extra` entries
+  given as a bare name (`cmd.exe`) or an App Paths name (`chrome`).
+- Icons are sharp at 100%, 150% and 200% scaling. Moving between monitors with
+  different scaling redraws them at the new size, not stretched.
+- First open after starting mrun: the rows appear at once and the icons fill in
+  a moment later. Typing never waits on an icon.
+- An `extra` entry whose `exec` does not exist, and a Lua row with no `exec`:
+  an empty slot, with the title still lined up under the others.
+- `icon = ""` on a row draws no icon; `icon = "%WINDIR%\\explorer.exe"` draws
+  Explorer's; `icon = "C:\\...\\picture.jpg"` draws the picture.
+- `show_icons = false` and `--reload`: rows are drawn exactly as without icons,
+  titles flush with the prompt.
+- `icon_size = 16` and `--reload`: every icon is redrawn at the new size.
+- Hold `Down` through a long result list, then do it again: GDI objects in Task
+  Manager rise the first time and stay flat the second.
+- `mrun.exe --quit` straight after opening, while icons are still loading: it
+  exits promptly.
+
 ## With mshell
 
 - Bound with `mshell.exec("mrun.exe")`, the key opens mrun, and pressing it

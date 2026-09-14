@@ -11,6 +11,7 @@ typedef struct {
     wchar_t exec[MAX_PATH];
     wchar_t args[MRUN_ARGS_CAP];
     wchar_t cwd[MAX_PATH];
+    wchar_t icon[MAX_PATH];
     wchar_t subtitle[MRUN_SUB_CAP];
 } AppEntry;
 
@@ -108,6 +109,7 @@ static void apps_scan(const wchar_t *dir, int depth) {
         if (!e) break;
         mrun_copy_w(e->name, MRUN_TITLE_CAP, name);
         mrun_copy_w(e->exec, MAX_PATH, full);
+        mrun_copy_w(e->icon, MAX_PATH, full);
         if (s_apps.show_path) mrun_copy_w(e->subtitle, MRUN_SUB_CAP, dir);
     } while (FindNextFileW(h, &fd) && s_apps.count < APPS_MAX_ENTRIES);
 
@@ -159,6 +161,7 @@ static void apps_add_packaged(IShellItem *item) {
         if (e) {
             mrun_copy_w(e->name, MRUN_TITLE_CAP, name);
             mrun_copy_w(e->exec, MAX_PATH, exec);
+            mrun_copy_w(e->icon, MAX_PATH, exec);
         }
     }
 
@@ -230,6 +233,13 @@ static void apps_read_extra(AppsState *st, lua_State *L, int tbl) {
 
         lua_getfield(L, -1, "cwd");
         mrun_utf8_to_w(lua_tostring(L, -1), e->cwd, MAX_PATH);
+        lua_pop(L, 1);
+
+        lua_getfield(L, -1, "icon");
+        if (lua_isstring(L, -1))
+            mrun_utf8_to_w(lua_tostring(L, -1), e->icon, MAX_PATH);
+        else
+            mrun_copy_w(e->icon, MAX_PATH, e->exec);
         lua_pop(L, 1);
 
         lua_getfield(L, -1, "subtitle");
@@ -353,6 +363,7 @@ static void apps_search(MrunModule *m, const wchar_t *query, MrunResults *out) {
         mrun_copy_w(item.exec,     MAX_PATH,       e->exec);
         mrun_copy_w(item.args,     MRUN_ARGS_CAP,  e->args);
         mrun_copy_w(item.cwd,      MAX_PATH,       e->cwd);
+        mrun_copy_w(item.icon,     MAX_PATH,       e->icon);
 
         mrun_results_add(out, m, &item, score);
     }

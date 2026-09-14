@@ -56,6 +56,7 @@ MRUN_SRCS = $(SRC_DIR)/mrun.c        \
             $(SRC_DIR)/mrun_lua.c    \
             $(SRC_DIR)/mrun_module.c \
             $(SRC_DIR)/mrun_score.c  \
+            $(SRC_DIR)/mrun_icon.c   \
             $(SRC_DIR)/mod_apps.c    \
             $(SRC_DIR)/log.c
 

@@ -39,6 +39,7 @@
 #define WM_MRUN_TOGGLE (WM_APP + 3)
 #define WM_MRUN_RELOAD (WM_APP + 4)
 #define WM_MRUN_QUIT   (WM_APP + 5)
+#define WM_MRUN_ICON   (WM_APP + 6)
 
 typedef struct MrunModule MrunModule;
 
@@ -48,6 +49,7 @@ typedef struct {
     wchar_t     exec[MAX_PATH];
     wchar_t     args[MRUN_ARGS_CAP];
     wchar_t     cwd[MAX_PATH];
+    wchar_t     icon[MAX_PATH];
     int         lua_ref;
     int         score;
     int         seq;
@@ -92,6 +94,7 @@ typedef struct {
     int          padding;
     int          font_size;
     int          sub_font_size;
+    int          icon_size;
     wchar_t      font[LF_FACESIZE];
     COLORREF     bg;
     COLORREF     fg;
@@ -106,6 +109,7 @@ typedef struct {
     int          corner_radius;
     bool         rounded;
     bool         show_subtitles;
+    bool         show_icons;
     bool         show_module;
     bool         show_scrollbar;
     MrunPosition position;
@@ -191,5 +195,10 @@ void mrun_ui_hide(void);
 void mrun_ui_toggle(void);
 void mrun_ui_refresh(void);
 void mrun_ui_set_query(const wchar_t *text);
+
+HBITMAP mrun_icons_get(const wchar_t *source, int size);
+bool    mrun_icons_deliver(WPARAM tag, LPARAM bitmap);
+void    mrun_icons_flush(void);
+void    mrun_icons_shutdown(void);
 
 #endif

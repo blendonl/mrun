@@ -23,6 +23,7 @@ mrun.set_appearance({
     font          = "Segoe UI",
     font_size     = 16,
     sub_font_size = 12,
+    icon_size     = 24,
 
     bg        = 0x1e1e2e,     -- 0xRRGGBB
     fg        = 0xcdd6f4,
@@ -41,6 +42,7 @@ mrun.set_appearance({
     top_offset     = 18,      -- percent down the work area, "top" only
 
     show_subtitles = true,
+    show_icons     = true,
     show_module    = true,    -- name of the module that produced each row
     show_scrollbar = true,
 
@@ -98,6 +100,7 @@ mrun.configure("apps", {
 --       subtitle = "...",     -- optional second line
 --       exec = "...",         -- optional; launched when there is no activate
 --       args = "...", cwd = "...",
+--       icon = "...",         -- optional; defaults to exec, "" for none
 --       score = 123 }         -- optional; skip it and mrun ranks by title
 --
 -- `activate(item, query)` runs on Enter. Return false to keep mrun open;

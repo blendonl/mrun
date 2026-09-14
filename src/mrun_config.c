@@ -10,6 +10,7 @@ void mrun_appearance_defaults(MrunAppearance *a) {
     a->padding        = 12;
     a->font_size      = 16;
     a->sub_font_size  = 12;
+    a->icon_size      = 24;
     a->border_width   = 1;
     a->opacity        = 246;
     a->corner_radius  = 10;
@@ -26,6 +27,7 @@ void mrun_appearance_defaults(MrunAppearance *a) {
 
     a->rounded        = true;
     a->show_subtitles = true;
+    a->show_icons     = true;
     a->show_module    = true;
     a->show_scrollbar = true;
     a->position       = MRUN_POS_TOP;

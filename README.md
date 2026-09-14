@@ -182,9 +182,12 @@ mrun.module({
 })
 ```
 
-A row is `{ title, subtitle, exec, args, cwd, score }` — only `title` is
+A row is `{ title, subtitle, exec, args, cwd, icon, score }` — only `title` is
 required. Supply `score` to rank it yourself; leave it out and mrun ranks by
-`title`. `activate` returning `false` keeps the launcher open; anything else
+`title`. `icon` is a path whose shell icon is drawn beside the row, and
+defaults to `exec`: an exe, a shortcut, a folder, a URL or a bare name on
+`PATH` all work, an image file is drawn as itself, and `""` draws none. The
+same `icon` field works on the apps module's `extra` entries. `activate` returning `false` keeps the launcher open; anything else
 closes it. A module whose `search` raises is logged and skipped — the others
 still answer.
 
@@ -200,7 +203,7 @@ piece with no Windows in it, so it is unit-tested: `make test`.
 
 | | |
 |-|-|
-| `mrun.set_appearance{}` | size, colours, fonts, opacity, rounding, position |
+| `mrun.set_appearance{}` | size, colours, fonts, icons, opacity, rounding, position |
 | `mrun.set_behaviour{}` | `hide_on_blur`, `clear_on_hide`, `log_level` |
 | `mrun.set_modules{}` | which modules are enabled, and their search order |
 | `mrun.configure(name, {})` | settings for one module |
@@ -251,6 +254,7 @@ tiling it.
 | `mrun_lua.c` | the `mrun.*` API, and the bridge for Lua-backed modules |
 | `mrun_module.c` | the module registry, prefix routing, ranking |
 | `mrun_score.c` | the fuzzy matcher — no Windows in it, so it is unit-tested |
+| `mrun_icon.c` | row icons: loaded from the shell on a background thread, cached per path |
 | `mod_apps.c` | the app-launching module |
 | `log.c` | leveled rotating log |
 
