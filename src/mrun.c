@@ -145,6 +145,7 @@ typedef struct {
     bool     daemon;
     bool     check;
     bool     version;
+    bool     update;
     bool     usage;
     LogLevel level;
     bool     level_set;
@@ -175,6 +176,7 @@ static void parse_args(Options *opt) {
         else if (match(a, L"--daemon"))  opt->daemon  = true;
         else if (match(a, L"--check"))   opt->check   = true;
         else if (match(a, L"--version")) opt->version = true;
+        else if (match(a, L"--update"))  opt->update  = true;
         else if (match(a, L"--help") || match(a, L"-h")) opt->usage = true;
         else if (match(a, L"--config") && next) {
             mrun_copy_w(opt->config, MAX_PATH, next);
@@ -212,6 +214,7 @@ static const char *USAGE =
     "  mrun --query <text>      open with <text> typed in\n"
     "  mrun --reload            reload the config of the running instance\n"
     "  mrun --quit              stop the running instance\n"
+    "  mrun --update            install the latest release over this copy\n"
     "  mrun --check             validate the config and exit\n"
     "  mrun --config <path>     use this config file\n"
     "  mrun --log-level <lvl>   error|warn|info|debug|trace\n"
@@ -284,6 +287,13 @@ static int run_check(const Options *opt) {
     return ok ? 0 : 1;
 }
 
+static int run_update(void) {
+    if (mrun_update_start()) return 0;
+
+    console_print("error: could not start the updater");
+    return 1;
+}
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    LPSTR lpCmdLine, int nCmdShow) {
     (void)hPrevInstance;
@@ -299,6 +309,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     if (opt.usage)   { console_print(USAGE);        return 0; }
     if (opt.version) { console_print(MRUN_VERSION); return 0; }
     if (opt.check)   { return run_check(&opt); }
+    if (opt.update)  { return run_update(); }
 
     HANDLE once = CreateMutexW(NULL, TRUE, MRUN_MUTEX);
     if (once && GetLastError() == ERROR_ALREADY_EXISTS) {

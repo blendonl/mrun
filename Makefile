@@ -56,7 +56,9 @@ MRUN_SRCS = $(SRC_DIR)/mrun.c        \
             $(SRC_DIR)/mrun_lua.c    \
             $(SRC_DIR)/mrun_module.c \
             $(SRC_DIR)/mrun_score.c  \
+            $(SRC_DIR)/mrun_update.c \
             $(SRC_DIR)/mod_apps.c    \
+            $(SRC_DIR)/mod_settings.c \
             $(SRC_DIR)/log.c
 
 # --- Lua sources ---
@@ -112,7 +114,7 @@ DIST_FILES = README.md CHANGELOG.md MANUAL-TESTS.md LICENSE
 # MANUAL-TESTS.md.
 HOST_CC   = cc
 TEST_DIR  = test
-TEST_BINS = $(TEST_DIR)/test_mrun_score
+TEST_BINS = $(TEST_DIR)/test_mrun_score $(TEST_DIR)/test_mrun_update
 
 .PHONY: all bump clean check-lua dist test print-version
 
@@ -200,6 +202,10 @@ dist: $(TARGET)
 $(TEST_DIR)/test_mrun_score: $(TEST_DIR)/test_mrun_score.c $(SRC_DIR)/mrun_score.c $(SRC_DIR)/mrun_score.h
 	@echo "  HOSTCC $@"
 	$(HOST_CC) -O1 -Wall -Wextra -o $@ $(TEST_DIR)/test_mrun_score.c $(SRC_DIR)/mrun_score.c
+
+$(TEST_DIR)/test_mrun_update: $(TEST_DIR)/test_mrun_update.c $(SRC_DIR)/mrun_update.c $(SRC_DIR)/mrun_update.h
+	@echo "  HOSTCC $@"
+	$(HOST_CC) -O1 -Wall -Wextra -o $@ $(TEST_DIR)/test_mrun_update.c $(SRC_DIR)/mrun_update.c
 
 test: $(TEST_BINS)
 	@echo "  TEST"
