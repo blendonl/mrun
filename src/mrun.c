@@ -284,12 +284,7 @@ static int run_check(const Options *opt) {
     return ok ? 0 : 1;
 }
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                   LPSTR lpCmdLine, int nCmdShow) {
-    (void)hPrevInstance;
-    (void)lpCmdLine;
-    (void)nCmdShow;
-
+static int run(HINSTANCE hInstance) {
     mr.hinst = hInstance;
     mrun_appearance_defaults(&mr.look);
 
@@ -346,4 +341,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     log_msg(LOG_INFO, L"mrun: exiting");
     log_shutdown();
     return 0;
+}
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+                   LPSTR lpCmdLine, int nCmdShow) {
+    (void)hPrevInstance;
+    (void)lpCmdLine;
+    (void)nCmdShow;
+
+    HRESULT com = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
+                                       COINIT_DISABLE_OLE1DDE);
+    int rc = run(hInstance);
+    if (SUCCEEDED(com)) CoUninitialize();
+    return rc;
 }
