@@ -122,11 +122,10 @@ make clean && make VERSION=0.0.1 \
   in red until you press `Enter`, and mrun keeps running.
 - Run a copy from a folder with an apostrophe in its name (`C:\O'Brien\mrun`)
   and update it: the files land in that folder.
-- Put a `README.md` and a `LICENSE` of your own beside the copy (as `mshell.exe`
-  might have), then update: `mrun.exe` and `config\mrun.lua` are replaced, and
-  your two files are untouched, with no `CHANGELOG.md` or `MANUAL-TESTS.md`
-  added. The one-line installer, run over a folder of its own, still copies all
-  of them.
+- Put a `README.md` and a `LICENSE` of your own beside the copy, then update:
+  `mrun.exe` and `config\mrun.lua` are replaced, and your two files are
+  untouched, with no `CHANGELOG.md` or `MANUAL-TESTS.md` added. The one-line
+  installer, run over a folder of its own, still copies all of them.
 
 ## Display
 

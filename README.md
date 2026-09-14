@@ -97,10 +97,10 @@ first, showing the folder it is about to overwrite; `--update` does not ask.
 
 If that folder already has the latest release, nothing is downloaded. An update
 never touches your `PATH`, and it replaces `mrun.exe` and `config\mrun.lua`
-without copying in the README, changelog or license, so a folder mrun shares
-with `mshell.exe` keeps its own. Progress shows in a PowerShell window, which
-closes by itself when the update succeeds and stays open with the error if it
-fails.
+without copying in the README, changelog or license. Give mrun a folder of its
+own, such as the one the install script uses, rather than dropping it into
+another program's. Progress shows in a PowerShell window, which closes by itself
+when the update succeeds and stays open with the error if it fails.
 
 ## Using it
 
