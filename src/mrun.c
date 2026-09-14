@@ -1,3 +1,4 @@
+#define COBJMACROS
 #include "mrun.h"
 
 Mrun mr;
@@ -76,11 +77,71 @@ bool mrun_set_clipboard(const wchar_t *text) {
     return ok;
 }
 
+static const wchar_t MRUN_APPS_FOLDER[] = L"shell:AppsFolder\\";
+
+static const PROPERTYKEY PKEY_APP_HOST_ENVIRONMENT = {
+    { 0x9f4c2855, 0x9f79, 0x4b39,
+      { 0xa8, 0xd0, 0xe1, 0xd4, 0x2d, 0xe1, 0xd5, 0xf3 } },
+    14
+};
+
+enum { APP_HOST_IMMERSIVE = 1 };
+
+static const wchar_t *packaged_app_id(const wchar_t *cmd) {
+    size_t prefix = ARRAYSIZE(MRUN_APPS_FOLDER) - 1;
+    if (_wcsnicmp(cmd, MRUN_APPS_FOLDER, prefix) != 0) return NULL;
+    return cmd[prefix] ? cmd + prefix : NULL;
+}
+
+static bool packaged_app_is_desktop(const wchar_t *parsing_name) {
+    IShellItem2 *item = NULL;
+    if (FAILED(SHCreateItemFromParsingName(parsing_name, NULL, &IID_IShellItem2,
+                                           (void **)&item)))
+        return false;
+
+    ULONG   host = APP_HOST_IMMERSIVE;
+    HRESULT hr   = IShellItem2_GetUInt32(item, &PKEY_APP_HOST_ENVIRONMENT,
+                                         &host);
+    IShellItem2_Release(item);
+    return SUCCEEDED(hr) && host != APP_HOST_IMMERSIVE;
+}
+
+static HRESULT activate_packaged_app(const wchar_t *aumid,
+                                     const wchar_t *params) {
+    IApplicationActivationManager *manager = NULL;
+    HRESULT hr = CoCreateInstance(&CLSID_ApplicationActivationManager, NULL,
+                                  CLSCTX_SERVER,
+                                  &IID_IApplicationActivationManager,
+                                  (void **)&manager);
+    if (FAILED(hr)) return hr;
+
+    CoAllowSetForegroundWindow((IUnknown *)manager, NULL);
+
+    DWORD pid = 0;
+    hr = IApplicationActivationManager_ActivateApplication(manager, aumid,
+                                                           params, AO_NONE,
+                                                           &pid);
+    IApplicationActivationManager_Release(manager);
+    return hr;
+}
+
 bool mrun_spawn(const wchar_t *cmd, const wchar_t *args, const wchar_t *cwd) {
     if (!cmd || !cmd[0]) return true;
 
     const wchar_t *params = (args && args[0]) ? args : NULL;
     const wchar_t *dir    = (cwd  && cwd[0])  ? cwd  : NULL;
+
+    const wchar_t *aumid = packaged_app_id(cmd);
+    if (aumid && packaged_app_is_desktop(cmd)) {
+        HRESULT hr = activate_packaged_app(aumid, params);
+        if (SUCCEEDED(hr)) {
+            log_w(L"mrun: activated '%ls'%ls%ls", aumid, params ? L" " : L"",
+                  params ? params : L"");
+            return true;
+        }
+        log_msg(LOG_WARN, L"mrun: could not activate '%ls' (0x%08lX), "
+                          L"trying ShellExecute", aumid, (unsigned long)hr);
+    }
 
     INT_PTR code = (INT_PTR)ShellExecuteW(NULL, L"open", cmd, params, dir,
                                           SW_SHOWNORMAL);
