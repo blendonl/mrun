@@ -1,6 +1,8 @@
 param(
     [string]$Version,
-    [string]$InstallDir = (Join-Path $env:LOCALAPPDATA 'Programs\mrun')
+    [string]$InstallDir = (Join-Path $env:LOCALAPPDATA 'Programs\mrun'),
+    [switch]$SkipPath,
+    [switch]$SkipDocs
 )
 
 function Get-MrunRelease {
@@ -17,6 +19,13 @@ function Get-MrunRelease {
         throw "Release $($found.tag_name) has no mrun-*-win64.zip to install."
     }
     [pscustomobject]@{ Tag = $found.tag_name; Name = $asset.name; Url = $asset.browser_download_url }
+}
+
+function Get-InstalledVersion {
+    param([string]$Exe)
+    if (Test-Path -LiteralPath $Exe -PathType Leaf) {
+        (Get-Item -LiteralPath $Exe).VersionInfo.ProductVersion
+    }
 }
 
 function Stop-InstalledMrun {
@@ -58,8 +67,19 @@ function Add-UserPath {
     return $true
 }
 
+function Copy-MrunPayload {
+    param([string]$From, [string]$To, [switch]$SkipDocs)
+    if (-not $SkipDocs) {
+        Copy-Item (Join-Path $From '*') $To -Recurse -Force
+        return
+    }
+    Get-ChildItem -LiteralPath $From |
+        Where-Object Name -notin 'README.md', 'CHANGELOG.md', 'MANUAL-TESTS.md', 'LICENSE' |
+        Copy-Item -Destination $To -Recurse -Force
+}
+
 function Install-Mrun {
-    param([string]$Version, [string]$InstallDir)
+    param([string]$Version, [string]$InstallDir, [switch]$SkipPath, [switch]$SkipDocs)
     $ErrorActionPreference = 'Stop'
     $ProgressPreference = 'SilentlyContinue'
     [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
@@ -70,6 +90,11 @@ function Install-Mrun {
 
     $release = Get-MrunRelease $Version
     $exe = Join-Path $InstallDir 'mrun.exe'
+    if ((Get-InstalledVersion $exe) -eq $release.Tag.TrimStart('v')) {
+        Write-Host "mrun $($release.Tag) is already installed in $InstallDir"
+        return
+    }
+
     $staging = Join-Path ([IO.Path]::GetTempPath()) "mrun-install-$([guid]::NewGuid())"
     New-Item -ItemType Directory $staging | Out-Null
     try {
@@ -81,12 +106,12 @@ function Install-Mrun {
 
         $wasRunning = Stop-InstalledMrun $exe
         New-Item -ItemType Directory -Force $InstallDir | Out-Null
-        Copy-Item (Join-Path $payload.FullName '*') $InstallDir -Recurse -Force
+        Copy-MrunPayload $payload.FullName $InstallDir -SkipDocs:$SkipDocs
     } finally {
         Remove-Item $staging -Recurse -Force -ErrorAction SilentlyContinue
     }
 
-    $addedToPath = Add-UserPath $InstallDir
+    $addedToPath = if ($SkipPath) { $false } else { Add-UserPath $InstallDir }
     if ($wasRunning) {
         Start-Process $exe '--daemon'
     }
@@ -98,4 +123,4 @@ function Install-Mrun {
     Write-Host "Run 'mrun' to open it."
 }
 
-Install-Mrun -Version $Version -InstallDir $InstallDir
+Install-Mrun -Version $Version -InstallDir $InstallDir -SkipPath:$SkipPath -SkipDocs:$SkipDocs

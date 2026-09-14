@@ -38,7 +38,7 @@ nothing to fetch:
 ```sh
 sudo apt install gcc-mingw-w64-x86-64
 make            # -> mrun.exe
-make test       # host-side unit tests (the fuzzy matcher)
+make test       # host-side unit tests (the fuzzy matcher, the update command)
 make dist       # -> dist/mrun-<version>-win64.zip
 ```
 
@@ -87,6 +87,21 @@ Copy `config/mrun.lua` to `%APPDATA%\mrun\init.lua` when you want to configure
 it. Until then it runs on built-in defaults. Keep your changes there rather than
 in the copy beside the exe, which an upgrade overwrites.
 
+## Updating
+
+Type `update mrun` into the launcher and press `Enter`, or run `mrun --update`.
+Both run the install script above against the folder the running `mrun.exe` is
+in: the latest release is downloaded, a copy running from that folder is stopped
+while its files are replaced, and it starts again afterwards. The launcher asks
+first, showing the folder it is about to overwrite; `--update` does not ask.
+
+If that folder already has the latest release, nothing is downloaded. An update
+never touches your `PATH`, and it replaces `mrun.exe` and `config\mrun.lua`
+without copying in the README, changelog or license, so a folder mrun shares
+with `mshell.exe` keeps its own. Progress shows in a PowerShell window, which
+closes by itself when the update succeeds and stays open with the error if it
+fails.
+
 ## Using it
 
 ```
@@ -101,6 +116,7 @@ mrun --check             validate the config and exit
 mrun --config <path>     use this config file
 mrun --log-level <lvl>   error|warn|info|debug|trace
 mrun --quit              stop the resident instance
+mrun --update            install the latest release over this copy
 mrun --version           print the version and exit
 ```
 
@@ -128,15 +144,21 @@ path and a URL all work, because they are handed to `ShellExecuteW`.
 
 ## Modules
 
-Every result comes from a module. `apps` is the only built-in one today — it
-indexes both Start menus, plus the packaged (Microsoft Store / MSIX) apps that
-have no shortcut file there, such as Settings, Calculator or Claude; set
-`packaged = false` to leave those out. Clipboard history and emoji are the
-obvious next ones and will register under their own names.
+Every result comes from a module. Two are built in today. `apps` indexes both
+Start menus, plus the packaged (Microsoft Store / MSIX) apps that have no
+shortcut file there, such as Settings, Calculator or Claude; set
+`packaged = false` to leave those out. `settings` holds mrun's own actions —
+for now just **Update mrun**. Clipboard history and emoji are the obvious next
+ones and will register under their own names.
 
 `set_modules` lists the enabled ones and the order they are searched in. Order
 of declaration in the file does not matter; names are resolved after the whole
 config has run.
+
+`settings` is the one exception: it stays enabled when `set_modules` leaves it
+out, so a config written before it existed can still update mrun. Turn it off
+with `mrun.configure("settings", { enabled = false })`. Give it a `prefix` and
+typing that prefix alone lists everything in it.
 
 ```lua
 mrun.set_modules({ "apps", "calc" })
@@ -196,8 +218,8 @@ still answer.
 Fuzzy and subsequence-based, with **prefix**, **word-boundary** and
 **camelCase** hits ranked above scattered ones, consecutive runs rewarded and
 long gaps penalised. So `vsc` finds *Visual Studio Code*, `fire` puts *Firefox*
-above *Notepad Firewall Helper*, and an exact name always wins. This is the one
-piece with no Windows in it, so it is unit-tested: `make test`.
+above *Notepad Firewall Helper*, and an exact name always wins. There is no
+Windows in it, so it is unit-tested: `make test`.
 
 ## The `mrun.*` API
 
@@ -255,7 +277,10 @@ tiling it.
 | `mrun_module.c` | the module registry, prefix routing, ranking |
 | `mrun_score.c` | the fuzzy matcher — no Windows in it, so it is unit-tested |
 | `mrun_icon.c` | row icons: loaded from the shell on a background thread, cached per path |
+| `mrun_update.c` | the PowerShell command an update runs — no Windows in it, so it is unit-tested |
 | `mod_apps.c` | the app-launching module |
+| `mod_settings.c` | mrun's own actions, starting with updating it |
+| `install.ps1` | installs, upgrades, and does the work of an update |
 | `log.c` | leveled rotating log |
 
 ## License

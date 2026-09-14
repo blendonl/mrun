@@ -45,7 +45,12 @@ void mrun_module_set_order(const wchar_t **names, int count) {
 }
 
 static void resolve_explicit_order(void) {
-    for (int i = 0; i < mr.module_count; i++) mr.modules[i].enabled = false;
+    bool keep_unlisted[MRUN_MAX_MODULES];
+    for (int i = 0; i < mr.module_count; i++) {
+        keep_unlisted[i] = mr.modules[i].enabled_when_unlisted &&
+                           mr.modules[i].enabled;
+        mr.modules[i].enabled = false;
+    }
 
     mr.order_count = 0;
     for (int i = 0; i < mr.order_names_count; i++) {
@@ -59,6 +64,12 @@ static void resolve_explicit_order(void) {
         m->enabled = true;
         mr.order[mr.order_count++] = (int)(m - mr.modules);
     }
+
+    for (int i = 0; i < mr.module_count; i++) {
+        if (!keep_unlisted[i] || mr.modules[i].enabled) continue;
+        mr.modules[i].enabled = true;
+        mr.order[mr.order_count++] = i;
+    }
 }
 
 void mrun_modules_reset(void) {
@@ -68,6 +79,7 @@ void mrun_modules_reset(void) {
     mr.order_names_count  = 0;
     mr.order_explicit     = false;
     mod_apps_register();
+    mod_settings_register();
 }
 
 void mrun_modules_init(void) {

@@ -1,7 +1,8 @@
 # Manual test checklist
 
 `make test` covers the logic with no Windows in it — the fuzzy matcher, which
-decides what a query matches and in what order. Everything below needs a real
+decides what a query matches and in what order, and the PowerShell command an
+update runs, down to how a folder name is quoted. Everything below needs a real
 Windows machine, because it involves a window, the keyboard or the shell.
 
 None of this needs a window manager. Run it from `cmd.exe` alongside Explorer;
@@ -81,6 +82,51 @@ to look.
 - A Lua module returning a row with no `title`: skipped, not crashed.
 - `mrun.configure("apps", { paths = { "%APPDATA%\\..." } })`: environment
   variables in paths are expanded.
+
+## Updating
+
+Build a copy that is older than the latest release, so there is something to
+update, and run it from a folder of its own:
+
+```sh
+make clean && make VERSION=0.0.1
+```
+
+An update runs `install.ps1` from `main`. To try a branch's `install.ps1` before
+it is merged, point the build at it:
+
+```sh
+make clean && make VERSION=0.0.1 \
+  "CFLAGS_EXTRA=-DMRUN_UPDATE_SCRIPT='L\"https://raw.githubusercontent.com/blendonl/mrun/<branch>/install.ps1\"'"
+```
+
+- Type `update mrun`: **Update mrun** is the top row, badged `settings`, and
+  its subtitle names the version you have. With an empty query it is **not** in
+  the list.
+- With `set_modules({ "apps", "calc" })`, which does not name `settings`, the
+  row is still there. Add `mrun.configure("settings", { enabled = false })`
+  and `--reload`: it is gone.
+- `Enter` on it: the launcher hides and a Yes/No box names the installed version
+  and the folder. **No** does nothing: no PowerShell window, mrun still running.
+- **Yes**: a PowerShell window downloads the release, mrun quits, the files are
+  replaced, and mrun comes back resident (`mrun` opens it at once). The window
+  closes by itself a few seconds later. Open it and search for `update mrun`
+  again: the subtitle shows the new version.
+- Run it again on the latest release: the window says it is already installed,
+  downloads nothing, and mrun is **not** restarted.
+- Your `%APPDATA%\mrun\init.lua` is untouched and the user `PATH` is unchanged
+  (`[Environment]::GetEnvironmentVariable('Path', 'User')` before and after),
+  including when mrun lives in a folder that is not on `PATH`.
+- `mrun.exe --update` from a terminal: the same update starts without asking.
+- Unplug the network and update: the PowerShell window stays open with the error
+  in red until you press `Enter`, and mrun keeps running.
+- Run a copy from a folder with an apostrophe in its name (`C:\O'Brien\mrun`)
+  and update it: the files land in that folder.
+- Put a `README.md` and a `LICENSE` of your own beside the copy (as `mshell.exe`
+  might have), then update: `mrun.exe` and `config\mrun.lua` are replaced, and
+  your two files are untouched, with no `CHANGELOG.md` or `MANUAL-TESTS.md`
+  added. The one-line installer, run over a folder of its own, still copies all
+  of them.
 
 ## Display
 
