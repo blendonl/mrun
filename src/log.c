@@ -78,7 +78,7 @@ void log_set_level(LogLevel level) {
 
 LogLevel log_get_level(void) { return s_level; }
 
-/* Build "<dir>\mshell\<basename>.log", creating the directory. Prefers
+/* Build "<dir>\mrun\<basename>.log", creating the directory. Prefers
  * %LOCALAPPDATA%; falls back to %TEMP% so a session with neither still logs
  * somewhere rather than silently not at all. */
 static bool log_resolve_path(const wchar_t *basename, wchar_t *out, size_t cap) {
@@ -96,11 +96,11 @@ static bool log_resolve_path(const wchar_t *basename, wchar_t *out, size_t cap) 
         dir[n]   = L'\0';
     }
 
-    if (_snwprintf(out, cap, L"%lsmshell", dir) < 0) return false;
+    if (_snwprintf(out, cap, L"%lsmrun", dir) < 0) return false;
     out[cap - 1] = L'\0';
     CreateDirectoryW(out, NULL);   /* ERROR_ALREADY_EXISTS is the normal case */
 
-    if (_snwprintf(out, cap, L"%lsmshell\\%ls.log", dir, basename) < 0) return false;
+    if (_snwprintf(out, cap, L"%lsmrun\\%ls.log", dir, basename) < 0) return false;
     out[cap - 1] = L'\0';
     return true;
 }

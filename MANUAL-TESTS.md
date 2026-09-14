@@ -4,10 +4,10 @@
 decides what a query matches and in what order. Everything below needs a real
 Windows machine, because it involves a window, the keyboard or the shell.
 
-None of this needs mshell. Run it from `cmd.exe` alongside Explorer; the last
-section is the only part that wants a window manager.
+None of this needs a window manager. Run it from `cmd.exe` alongside Explorer;
+the last section is the only part that wants one.
 
-`%LOCALAPPDATA%\mshell\mrun.log` is written on every run and is the first place
+`%LOCALAPPDATA%\mrun\mrun.log` is written on every run and is the first place
 to look.
 
 ## Resident instance and the CLI
@@ -93,11 +93,9 @@ to look.
 
 ## With mshell
 
+- Bound with `mshell.exec("mrun.exe")`, the key opens mrun, and pressing it
+  again hides it.
 - mshell does **not** tile it, put a focus ring on it, or count it as a window
-  (`mrun_Window` is in mshell's ignore list). It floats over the tiles.
-- With `mrun.exe` beside `mshell.exe`, mshell's `launcher` action opens **mrun**.
-- With `mrun.exe` only on `PATH`, it still opens mrun.
-- With `mrun.exe` neither beside mshell nor on `PATH`, the action falls back to
-  mshell's built-in overlay and nothing errors.
+  (it is a tool window). It floats over the tiles.
 - Open mrun, then quit mshell from another machine/Task Manager: mrun is
   unaffected — it is a separate process and owns its own keyboard input.

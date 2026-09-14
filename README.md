@@ -13,9 +13,9 @@ a module is thirty lines of Lua if you want it to be.
 └──────────────────────────────────────────────────────────┘
 ```
 
-Built for [mshell](https://github.com/blendonl/mshell) — a tiling WM that replaces
-`explorer.exe`, where there is no Start menu and no Run box — but it depends on
-nothing from it and works fine under plain Explorer.
+It runs under plain Explorer or any window manager and needs neither. It is a
+natural fit for [mshell](https://github.com/blendonl/mshell) — a tiling WM that
+replaces `explorer.exe`, where there is no Start menu and no Run box.
 
 ## Why it is its own program
 
@@ -28,7 +28,7 @@ time it learns something new. Keeping it separate means:
   window, so it reads the keyboard the way every other app does. A launcher
   drawn *by* a WM typically cannot take focus, and has to intercept the
   keyboard globally to be typed into at all.
-- **It is useful on its own.** No mshell required.
+- **It is useful on its own.** No window manager required.
 
 ## Build
 
@@ -182,7 +182,7 @@ and documents every field.
 |-------|------|
 | `%APPDATA%\mrun\init.lua` | your config |
 | `config\mrun.lua` beside `mrun.exe` | the portable fallback, and the shipped reference |
-| `%LOCALAPPDATA%\mshell\mrun.log` | its log |
+| `%LOCALAPPDATA%\mrun\mrun.log` | its log |
 
 A config error is **atomic**: the whole file is rejected and mrun runs on
 built-in defaults rather than half of what you wrote, with the reason in the
@@ -191,16 +191,16 @@ trust it.
 
 ## With mshell
 
-mshell's `launcher` action prefers `mrun.exe` — beside `mshell.exe` first, then
-`PATH` — and falls back to its own small built-in overlay when neither has it.
-So there is nothing to configure: install `mrun.exe` and the binding you already
-have starts using it. To bind it explicitly:
+mrun and [mshell](https://github.com/blendonl/mshell) know nothing about each
+other. Bind `mrun.exe` like any other program:
 
 ```lua
-mshell.bind("LWin+Space", "spawn", "mrun.exe")
+mshell.keys.bind({"LWin"}, "Space",
+    function() mshell.exec("mrun.exe") end, { desc = "run" })
 ```
 
-mshell knows not to tile it (`mrun_Window` is in its ignore list).
+Its window is a tool window, so mshell floats it over the tiles rather than
+tiling it.
 
 ## Architecture
 
@@ -213,7 +213,7 @@ mshell knows not to tile it (`mrun_Window` is in its ignore list).
 | `mrun_module.c` | the module registry, prefix routing, ranking |
 | `mrun_score.c` | the fuzzy matcher — no Windows in it, so it is unit-tested |
 | `mod_apps.c` | the app-launching module |
-| `log.c` | leveled rotating log (from mshell, standalone by design) |
+| `log.c` | leveled rotating log |
 
 ## License
 
