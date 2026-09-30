@@ -105,7 +105,7 @@ TARGET    = mrun.exe
 # --- Release packaging ---
 DISTNAME   = mrun-$(VERSION)-win64
 DISTDIR    = dist/$(DISTNAME)
-DIST_FILES = README.md CHANGELOG.md MANUAL-TESTS.md LICENSE
+DIST_FILES = README.md CHANGELOG.md MANUAL-TESTS.md LICENSE THIRD_PARTY_NOTICES
 
 # --- Host-side tests ---
 # mrun cross-compiles to Windows and cannot run here, but the logic with no
