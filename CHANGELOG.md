@@ -5,6 +5,17 @@ All notable changes to mrun are documented here. This project adheres to
 Sections after 0.1.0 are generated from commit messages; see *Releases* in the
 README.
 
+## 0.6.1
+
+### Other
+
+- **chore:** Keep LICENSE plain MIT so it is detected (a265c58)
+
+  The vendored-Lua notice appended to LICENSE stopped GitHub from
+  recognising the license, and the copyright named 'mrun contributors'.
+  LICENSE is now the plain MIT text under Blendon Luta; the Lua notice
+  moves to THIRD_PARTY_NOTICES, which release archives also ship.
+
 ## 0.6.0
 
 ### Fixed
