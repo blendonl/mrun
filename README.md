@@ -285,5 +285,5 @@ tiling it.
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Vendored Lua 5.4 is under its own MIT license
-(`vendor/lua/doc/readme.html`).
+MIT — see [LICENSE](LICENSE). Vendored Lua 5.4 is under its own MIT license;
+see [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES) and `vendor/lua/doc/readme.html`.

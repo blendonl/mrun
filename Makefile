@@ -7,7 +7,7 @@ CC       = x86_64-w64-mingw32-gcc
 WINDRES  = x86_64-w64-mingw32-windres
 
 # --- Version (single source of truth; baked into the binary and the zip) ---
-VERSION  = 0.6.0
+VERSION  = 0.6.1
 
 # VERSIONINFO needs the parts as separate numbers, so split them out here
 # rather than making anyone maintain the version in two shapes.
@@ -105,7 +105,7 @@ TARGET    = mrun.exe
 # --- Release packaging ---
 DISTNAME   = mrun-$(VERSION)-win64
 DISTDIR    = dist/$(DISTNAME)
-DIST_FILES = README.md CHANGELOG.md MANUAL-TESTS.md LICENSE
+DIST_FILES = README.md CHANGELOG.md MANUAL-TESTS.md LICENSE THIRD_PARTY_NOTICES
 
 # --- Host-side tests ---
 # mrun cross-compiles to Windows and cannot run here, but the logic with no
